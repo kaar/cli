@@ -298,6 +298,14 @@ var PullRequestFields = append(IssueFields,
 	"statusCheckRollup",
 )
 
+var GistFields = []string{
+  "id",
+  "description",
+  "fileCount",
+  "visibility",
+  "gistTime",
+}
+
 // IssueGraphQL constructs a GraphQL query fragment for a set of issue fields.
 func IssueGraphQL(fields []string) string {
 	var q []string

@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/cli/cli/v2/api"
 	"github.com/cli/cli/v2/internal/config"
 	"github.com/cli/cli/v2/internal/tableprinter"
 	"github.com/cli/cli/v2/internal/text"
@@ -19,9 +20,11 @@ type ListOptions struct {
 	IO         *iostreams.IOStreams
 	Config     func() (config.Config, error)
 	HttpClient func() (*http.Client, error)
+	Exporter   cmdutil.Exporter
 
 	Limit      int
 	Visibility string // all, secret, public
+
 }
 
 func NewCmdList(f *cmdutil.Factory, runF func(*ListOptions) error) *cobra.Command {
@@ -61,6 +64,7 @@ func NewCmdList(f *cmdutil.Factory, runF func(*ListOptions) error) *cobra.Comman
 	cmd.Flags().IntVarP(&opts.Limit, "limit", "L", 10, "Maximum number of gists to fetch")
 	cmd.Flags().BoolVar(&flagPublic, "public", false, "Show only public gists")
 	cmd.Flags().BoolVar(&flagSecret, "secret", false, "Show only secret gists")
+	cmdutil.AddJSONFlags(cmd, &opts.Exporter, api.GistFields)
 
 	return cmd
 }
@@ -91,6 +95,10 @@ func listRun(opts *ListOptions) error {
 		defer opts.IO.StopPager()
 	} else {
 		fmt.Fprintf(opts.IO.ErrOut, "failed to start pager: %v\n", err)
+	}
+
+	if opts.Exporter != nil {
+		return opts.Exporter.Write(opts.IO, gists)
 	}
 
 	cs := opts.IO.ColorScheme()
