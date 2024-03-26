@@ -27,6 +27,7 @@ type ChecksOptions struct {
 
 	Finder   shared.PRFinder
 	Detector fd.Detector
+	Exporter cmdutil.Exporter
 
 	SelectorArg string
 	WebMode     bool
@@ -96,6 +97,7 @@ func NewCmdChecks(f *cmdutil.Factory, runF func(*ChecksOptions) error) *cobra.Co
 	cmd.Flags().BoolVarP(&opts.FailFast, "fail-fast", "", false, "Exit watch mode on first check failure")
 	cmd.Flags().IntVarP(&interval, "interval", "i", 10, "Refresh interval in seconds when using `--watch` flag")
 	cmd.Flags().BoolVar(&opts.Required, "required", false, "Only show checks that are required")
+	cmdutil.AddJSONFlags(cmd, &opts.Exporter, api.PullRequestFields)
 
 	return cmd
 }
