@@ -19,6 +19,7 @@ func addRow(tp *tableprinter.TablePrinter, io *iostreams.IOStreams, o check) {
 		}
 	}
 
+
 	mark := "✓"
 	markColor := cs.Green
 	switch o.Bucket {
@@ -32,6 +33,14 @@ func addRow(tp *tableprinter.TablePrinter, io *iostreams.IOStreams, o check) {
 		mark = "-"
 		markColor = cs.Gray
 	}
+
+  // mark, markColor = {
+  //   "": ("X", cs.Red),
+  //   "fail": ("X", cs.Red),
+  //   "pending": ("*", cs.Yellow)
+  //   "skipping": ("-", cs.Gray)
+
+  // }[o.Bucket]
 
 	if io.IsStdoutTTY() {
 		var name string
