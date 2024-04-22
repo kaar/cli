@@ -20,6 +20,25 @@ import (
 
 const defaultInterval time.Duration = 10 * time.Second
 
+// Some checks are still pending
+// 0 failing, 4 successful, 0 skipped, and 2 pending checks
+
+// *  ci/circleci: pr/trigger-pr-deploy-to-canary    Your job is on hold on CircleCI!    https://circleci.com/workflow-run/6559b912-5b21-47dc-8d34-e8c5dff84048
+// *  ci/circleci: pr/trigger-pr-deploy-to-loadtest  Your job is on hold on CircleCI!    https://circleci.com/workflow-run/6559b912-5b21-47dc-8d34-e8c5dff84048
+// ✓  ci/circleci: build-cell-router                 Your tests passed on CircleCI!      https://circleci.com/gh/tibber/tibber-grid-rewards/5095
+// ✓  ci/circleci: build-grid-rewards                Your tests passed on CircleCI!      https://circleci.com/gh/tibber/tibber-grid-rewards/5098
+// ✓  ci/circleci: integration-test-cell-router      Your tests passed on CircleCI!      https://circleci.com/gh/tibber/tibber-grid-rewards/5096
+// ✓  ci/circleci: integration-test-grid-rewards     Your tests passed on CircleCI!      https://circleci.com/gh/tibber/tibber-grid-rewards/5097
+
+var CheckFields = []string{
+	"status",
+  "context",
+  "description",
+  "url",
+
+
+}
+
 type ChecksOptions struct {
 	HttpClient func() (*http.Client, error)
 	IO         *iostreams.IOStreams
@@ -27,6 +46,7 @@ type ChecksOptions struct {
 
 	Finder   shared.PRFinder
 	Detector fd.Detector
+	Exporter cmdutil.Exporter
 
 	SelectorArg string
 	WebMode     bool
@@ -96,6 +116,7 @@ func NewCmdChecks(f *cmdutil.Factory, runF func(*ChecksOptions) error) *cobra.Co
 	cmd.Flags().BoolVarP(&opts.FailFast, "fail-fast", "", false, "Exit watch mode on first check failure")
 	cmd.Flags().IntVarP(&interval, "interval", "i", 10, "Refresh interval in seconds when using `--watch` flag")
 	cmd.Flags().BoolVar(&opts.Required, "required", false, "Only show checks that are required")
+	cmdutil.AddJSONFlags(cmd, &opts.Exporter, CheckFields)
 
 	return cmd
 }
